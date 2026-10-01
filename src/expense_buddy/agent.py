@@ -2,7 +2,9 @@
 import os
 
 from langchain.agents import create_agent
+from langchain.agents.middleware import HumanInTheLoopMiddleware
 from langchain.chat_models import init_chat_model
+from langgraph.checkpoint.memory import InMemorySaver
 
 from expense_buddy import tools
 
@@ -40,4 +42,14 @@ def build_agent(model=None):
         model,
         tools=tools.ALL_TOOLS,
         system_prompt=SYSTEM_PROMPT.format(weekday=today.strftime("%A"), today=today.isoformat()),
+        middleware=[
+            # Deleting is destructive, so the code (not the prompt) pauses the run
+            # and waits for a human to approve or reject.
+            HumanInTheLoopMiddleware(
+                interrupt_on={"delete_expense": {"allowed_decisions": ["approve", "reject"]}}
+            )
+        ],
+        # A checkpointer saves state per thread_id; it's required for pausing
+        # and also gives the chat its memory.
+        checkpointer=InMemorySaver(),
     )
