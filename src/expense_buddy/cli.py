@@ -16,7 +16,7 @@ def _short(text) -> str:
     return text if len(text) <= MAX_PREVIEW else text[:MAX_PREVIEW] + "..."
 
 
-def _stream(agent, payload, config, show):
+def _stream(agent, payload, config, show, seen):
     """Run the agent, printing each step. Returns (final_reply, interrupts)."""
     reply, interrupts = "", []
     for update in agent.stream(payload, config, stream_mode="updates"):
@@ -27,6 +27,9 @@ def _stream(agent, payload, config, show):
             for message in (node_output or {}).get("messages", []):
                 if isinstance(message, AIMessage):
                     for call in message.tool_calls:
+                        if call["id"] in seen:  # the approval step re-emits the same message
+                            continue
+                        seen.add(call["id"])
                         show(f"  → calling {call['name']}({call['args']})")
                     if message.content and not message.tool_calls:
                         reply = message.content
@@ -59,8 +62,9 @@ def run_turn(agent, user_text, thread_id, show=print, confirm=input) -> str:
     """One user message -> final reply, handling approval pauses along the way."""
     config = {"configurable": {"thread_id": thread_id}}
     payload = {"messages": [("user", user_text)]}
+    seen = set()
     while True:
-        reply, interrupts = _stream(agent, payload, config, show)
+        reply, interrupts = _stream(agent, payload, config, show, seen)
         if not interrupts:
             return reply
         # Paused for approval: ask the human, then resume the same thread.
