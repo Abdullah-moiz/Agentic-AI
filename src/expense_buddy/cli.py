@@ -1,7 +1,7 @@
 """Terminal chat loop. Prints every agent step so you can watch it think."""
 import uuid
 
-from dotenv import load_dotenv
+from dotenv import find_dotenv, load_dotenv
 from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.types import Command
 
@@ -72,7 +72,7 @@ def run_turn(agent, user_text, thread_id, show=print, confirm=input) -> str:
 
 
 def main():
-    load_dotenv()
+    load_dotenv(find_dotenv(usecwd=True))  # look for .env in the folder you run from
     agent = build_agent()
     thread_id = uuid.uuid4().hex  # one id per session = one conversation memory
     print("Expense Buddy ready. Type 'quit' to leave.\n")

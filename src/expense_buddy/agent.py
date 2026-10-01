@@ -32,7 +32,7 @@ def build_agent(model=None):
     switching models never needs a code change.
     """
     if model is None:
-        model = os.environ.get("MODEL", "groq:llama-3.3-70b-versatile")
+        model = os.environ.get("MODEL", "groq:openai/gpt-oss-120b")
     if isinstance(model, str):
         # temperature=0 keeps the model predictable when picking tools.
         model = init_chat_model(model, temperature=0)
