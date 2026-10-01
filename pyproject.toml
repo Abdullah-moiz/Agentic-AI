@@ -15,6 +15,8 @@ dependencies = [
     "langchain-anthropic",
     "httpx",
     "python-dotenv",
+    "fastapi",
+    "uvicorn",
 ]
 
 [project.optional-dependencies]
@@ -22,9 +24,13 @@ dev = ["pytest"]
 
 [project.scripts]
 expense-buddy = "expense_buddy.cli:main"
+expense-buddy-ui = "expense_buddy.web:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+expense_buddy = ["static/*"]

@@ -29,6 +29,15 @@ cp .env.example .env      # then paste your GROQ_API_KEY into .env
 expense-buddy             # or: python -m expense_buddy
 ```
 
+Prefer a browser? Start the web UI and open http://127.0.0.1:8000:
+
+```bash
+expense-buddy-ui         # or: python -m expense_buddy.web
+```
+
+It has the same chat, shows each tool call, asks you to confirm deletes with
+buttons, and keeps a live "this month" panel on the side.
+
 Run the tests (no API key or internet needed):
 
 ```bash
@@ -66,6 +75,7 @@ The pieces:
 | `tools.py` | Five tools the model can call: `add_expense`, `list_expenses`, `get_summary`, `delete_expense`, `convert_currency`. |
 | `agent.py` | Glues model + tools + system prompt together with LangChain's `create_agent`. |
 | `cli.py` | The terminal chat. Prints each tool call and result. |
+| `web.py` + `static/index.html` | The browser version: a small FastAPI server and one HTML page. |
 
 A few ideas worth knowing:
 
